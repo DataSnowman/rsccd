@@ -5,13 +5,13 @@
 		"factoryName": {
 			"value": "rsccdrsccdgjacp5rwplhceadf"
 		},
+		"AzureBlobStorage_connectionString": {
+			"value": ""
+		},
 		"Demos_AdventureWorks2017_connectionString": {
 			"value": ""
 		},
 		"rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString": {
-			"value": ""
-		},
-		"AzureBlobStorage_connectionString": {
 			"value": ""
 		},
 		"containerUri": {
