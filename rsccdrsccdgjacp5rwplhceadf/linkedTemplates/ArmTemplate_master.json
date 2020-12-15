@@ -11,17 +11,21 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
 		},
+		"AzureSqlDatabaseSilver_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabaseSilver'"
+		},
 		"Demos_AdventureWorks2017_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Demos_AdventureWorks2017'"
 		},
+		"gold_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'gold'"
+		},
 		"rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'rsccdrsccdgjacp5rwplhcesrv_bronze'"
-		},
-		"AzureSqlDatabaseSilver_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabaseSilver'"
 		},
 		"containerUri": {
 			"type": "string",
@@ -53,14 +57,17 @@
 					"AzureBlobStorage_connectionString": {
 						"value": "[parameters('AzureBlobStorage_connectionString')]"
 					},
+					"AzureSqlDatabaseSilver_connectionString": {
+						"value": "[parameters('AzureSqlDatabaseSilver_connectionString')]"
+					},
 					"Demos_AdventureWorks2017_connectionString": {
 						"value": "[parameters('Demos_AdventureWorks2017_connectionString')]"
 					},
+					"gold_connectionString": {
+						"value": "[parameters('gold_connectionString')]"
+					},
 					"rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString": {
 						"value": "[parameters('rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString')]"
-					},
-					"AzureSqlDatabaseSilver_connectionString": {
-						"value": "[parameters('AzureSqlDatabaseSilver_connectionString')]"
 					}
 				}
 			},

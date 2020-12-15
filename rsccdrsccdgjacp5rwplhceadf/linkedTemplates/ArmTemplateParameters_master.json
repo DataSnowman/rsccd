@@ -8,13 +8,16 @@
 		"AzureBlobStorage_connectionString": {
 			"value": ""
 		},
+		"AzureSqlDatabaseSilver_connectionString": {
+			"value": ""
+		},
 		"Demos_AdventureWorks2017_connectionString": {
 			"value": ""
 		},
-		"rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString": {
+		"gold_connectionString": {
 			"value": ""
 		},
-		"AzureSqlDatabaseSilver_connectionString": {
+		"rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString": {
 			"value": ""
 		},
 		"containerUri": {

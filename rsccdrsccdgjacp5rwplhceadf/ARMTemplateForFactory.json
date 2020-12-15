@@ -11,17 +11,21 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
 		},
+		"AzureSqlDatabaseSilver_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabaseSilver'"
+		},
 		"Demos_AdventureWorks2017_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Demos_AdventureWorks2017'"
 		},
+		"gold_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'gold'"
+		},
 		"rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'rsccdrsccdgjacp5rwplhcesrv_bronze'"
-		},
-		"AzureSqlDatabaseSilver_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabaseSilver'"
 		}
 	},
 	"variables": {
@@ -10065,7 +10069,8 @@
 									"OrderHeader": {},
 									"SalesPerson": {},
 									"SilverStorage": {},
-									"SilverDatabase": {}
+									"SilverDatabase": {},
+									"Gold": {}
 								}
 							},
 							"staging": {},
@@ -10081,6 +10086,55 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/LoadOrders')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RunBoth')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ExecuteCopyThreeSourceTables",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "CopyThree",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "ExecuteLoadOrdersPipeline",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExecuteCopyThreeSourceTables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LoadOrdersPipeline",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/CopyThree')]",
+				"[concat(variables('factoryId'), '/pipelines/LoadOrdersPipeline')]"
 			]
 		},
 		{
@@ -10237,6 +10291,27 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTableSilver')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabaseSilver",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "test"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabaseSilver')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Demos_AdventureWorks2017')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -10316,6 +10391,27 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/rsccdrsccdgjacp5rwplhcesrv_bronze')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Gold')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "gold",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "gold"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/gold')]"
 			]
 		},
 		{
@@ -10589,6 +10685,19 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabaseSilver')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabaseSilver_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Demos_AdventureWorks2017')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -10597,6 +10706,19 @@
 				"type": "SqlServer",
 				"typeProperties": {
 					"connectionString": "[parameters('Demos_AdventureWorks2017_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/gold')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('gold_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -10668,6 +10790,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "SilverDatabase"
+						},
+						{
+							"dataset": {
+								"referenceName": "Gold",
+								"type": "DatasetReference"
+							},
+							"name": "Gold"
 						}
 					],
 					"transformations": [
@@ -10684,7 +10813,7 @@
 							"name": "DerivedColumn1"
 						}
 					],
-					"script": "source(output(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tCarrierTrackingNumber as string,\n\t\tOrderQty as integer,\n\t\tProductID as integer,\n\t\tSpecialOfferID as integer,\n\t\tUnitPrice as decimal(19,4),\n\t\tUnitPriceDiscount as decimal(19,4),\n\t\tLineTotal as decimal(38,6),\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrderDetail\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tRevisionNumber as integer,\n\t\tOrderDate as timestamp,\n\t\tDueDate as timestamp,\n\t\tShipDate as timestamp,\n\t\tStatus as integer,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp,\n\t\tCurrencyRateID as integer,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4),\n\t\tComment as string,\n\t\tTerritoryID as integer,\n\t\tBillToAddressID as integer,\n\t\tShipToAddressID as integer,\n\t\tShipMethodID as integer,\n\t\tCreditCardID as integer,\n\t\tCreditCardApprovalCode as string,\n\t\tOnlineOrderFlag as boolean,\n\t\tSalesOrderNumber as string,\n\t\tPurchaseOrderNumber as string,\n\t\tAccountNumber as string,\n\t\tCustomerID as integer,\n\t\tSalesPersonID as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrderHeader\nsource(output(\n\t\tBusinessEntityID as integer,\n\t\tTerritoryID as integer,\n\t\tSalesQuota as decimal(19,4),\n\t\tBonus as decimal(19,4),\n\t\tCommissionPct as decimal(10,4),\n\t\tSalesYTD as decimal(19,4),\n\t\tSalesLastYear as decimal(19,4),\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SalesPerson\nOrderDetail, OrderHeader join(OrderDetail@SalesOrderID == OrderHeader@SalesOrderID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinOrders\nJoinOrders, SalesPerson join(SalesPersonID == BusinessEntityID,\n\tjoinType:'outer',\n\tbroadcast: 'auto')~> JoinSalesPerson\nJoinSalesPerson select(mapColumn(\n\t\tSalesOrderID = OrderDetail@SalesOrderID,\n\t\tSalesOrderDetailID,\n\t\tCarrierTrackingNumber,\n\t\tOrderQty,\n\t\tProductID,\n\t\tSpecialOfferID,\n\t\tUnitPrice,\n\t\tUnitPriceDiscount,\n\t\tLineTotal,\n\t\trowguid = OrderDetail@rowguid,\n\t\tModifiedDate = OrderDetail@ModifiedDate,\n\t\tSalesOrderID = OrderHeader@SalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDate,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\trowguid = OrderHeader@rowguid,\n\t\tModifiedDate = OrderHeader@ModifiedDate,\n\t\tCurrencyRateID,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\tTerritoryID = OrderHeader@TerritoryID,\n\t\tBillToAddressID,\n\t\tShipToAddressID,\n\t\tShipMethodID,\n\t\tCreditCardID,\n\t\tCreditCardApprovalCode,\n\t\tOnlineOrderFlag,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tCustomerID,\n\t\tSalesPersonID,\n\t\tBusinessEntityID,\n\t\tTerritoryID = SalesPerson@TerritoryID,\n\t\tSalesQuota,\n\t\tBonus,\n\t\tCommissionPct,\n\t\tSalesYTD,\n\t\tSalesLastYear,\n\t\trowguid = SalesPerson@rowguid,\n\t\tModifiedDate = SalesPerson@ModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 derive(rundatepart = currentDate()) ~> DerivedColumn1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SilverStorage\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> SilverDatabase"
+					"script": "source(output(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tCarrierTrackingNumber as string,\n\t\tOrderQty as integer,\n\t\tProductID as integer,\n\t\tSpecialOfferID as integer,\n\t\tUnitPrice as decimal(19,4),\n\t\tUnitPriceDiscount as decimal(19,4),\n\t\tLineTotal as decimal(38,6),\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrderDetail\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tRevisionNumber as integer,\n\t\tOrderDate as timestamp,\n\t\tDueDate as timestamp,\n\t\tShipDate as timestamp,\n\t\tStatus as integer,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp,\n\t\tCurrencyRateID as integer,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4),\n\t\tComment as string,\n\t\tTerritoryID as integer,\n\t\tBillToAddressID as integer,\n\t\tShipToAddressID as integer,\n\t\tShipMethodID as integer,\n\t\tCreditCardID as integer,\n\t\tCreditCardApprovalCode as string,\n\t\tOnlineOrderFlag as boolean,\n\t\tSalesOrderNumber as string,\n\t\tPurchaseOrderNumber as string,\n\t\tAccountNumber as string,\n\t\tCustomerID as integer,\n\t\tSalesPersonID as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrderHeader\nsource(output(\n\t\tBusinessEntityID as integer,\n\t\tTerritoryID as integer,\n\t\tSalesQuota as decimal(19,4),\n\t\tBonus as decimal(19,4),\n\t\tCommissionPct as decimal(10,4),\n\t\tSalesYTD as decimal(19,4),\n\t\tSalesLastYear as decimal(19,4),\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SalesPerson\nOrderDetail, OrderHeader join(OrderDetail@SalesOrderID == OrderHeader@SalesOrderID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinOrders\nJoinOrders, SalesPerson join(SalesPersonID == BusinessEntityID,\n\tjoinType:'outer',\n\tbroadcast: 'auto')~> JoinSalesPerson\nJoinSalesPerson select(mapColumn(\n\t\tSalesOrderID = OrderDetail@SalesOrderID,\n\t\tSalesOrderDetailID,\n\t\tCarrierTrackingNumber,\n\t\tOrderQty,\n\t\tProductID,\n\t\tSpecialOfferID,\n\t\tUnitPrice,\n\t\tUnitPriceDiscount,\n\t\tLineTotal,\n\t\trowguid = OrderDetail@rowguid,\n\t\tModifiedDate = OrderDetail@ModifiedDate,\n\t\tSalesOrderID = OrderHeader@SalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDate,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\trowguid = OrderHeader@rowguid,\n\t\tModifiedDate = OrderHeader@ModifiedDate,\n\t\tCurrencyRateID,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\tTerritoryID = OrderHeader@TerritoryID,\n\t\tBillToAddressID,\n\t\tShipToAddressID,\n\t\tShipMethodID,\n\t\tCreditCardID,\n\t\tCreditCardApprovalCode,\n\t\tOnlineOrderFlag,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tCustomerID,\n\t\tSalesPersonID,\n\t\tBusinessEntityID,\n\t\tTerritoryID = SalesPerson@TerritoryID,\n\t\tSalesQuota,\n\t\tBonus,\n\t\tCommissionPct,\n\t\tSalesYTD,\n\t\tSalesLastYear,\n\t\trowguid = SalesPerson@rowguid,\n\t\tModifiedDate = SalesPerson@ModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 derive(rundatepart = currentDate()) ~> DerivedColumn1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SilverStorage\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> SilverDatabase\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> Gold"
 				}
 			},
 			"dependsOn": [
@@ -10692,90 +10821,8 @@
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
 				"[concat(variables('factoryId'), '/datasets/SalesPerson')]",
 				"[concat(variables('factoryId'), '/datasets/SilverOrders')]",
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTableSilver')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RunBoth')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ExecuteCopyThreeSourceTables",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "CopyThree",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "ExecuteLoadOrdersPipeline",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "ExecuteCopyThreeSourceTables",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "LoadOrdersPipeline",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/CopyThree')]",
-				"[concat(variables('factoryId'), '/pipelines/LoadOrdersPipeline')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabaseSilver')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureSqlDatabaseSilver_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTableSilver')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabaseSilver",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "test"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabaseSilver')]"
+				"[concat(variables('factoryId'), '/datasets/AzureSqlTableSilver')]",
+				"[concat(variables('factoryId'), '/datasets/Gold')]"
 			]
 		}
 	]
