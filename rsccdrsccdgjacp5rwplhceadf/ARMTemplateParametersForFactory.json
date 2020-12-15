@@ -13,6 +13,9 @@
 		},
 		"rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString": {
 			"value": ""
+		},
+		"AzureSqlDatabaseSilver_connectionString": {
+			"value": ""
 		}
 	}
 }
