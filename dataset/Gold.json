@@ -1,0 +1,16 @@
+{
+	"name": "Gold",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "gold",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "gold"
+		}
+	}
+}
