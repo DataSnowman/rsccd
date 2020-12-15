@@ -1,0 +1,12 @@
+{
+	"name": "TargetBronze",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "rsccdrsccdgjacp5rwplhcesrv_bronze",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
