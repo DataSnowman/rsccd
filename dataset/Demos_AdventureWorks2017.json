@@ -1,0 +1,12 @@
+{
+	"name": "Demos_AdventureWorks2017",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Demos_AdventureWorks2017",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}
