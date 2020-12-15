@@ -1,0 +1,19 @@
+{
+	"name": "SilverOrders",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "output"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
