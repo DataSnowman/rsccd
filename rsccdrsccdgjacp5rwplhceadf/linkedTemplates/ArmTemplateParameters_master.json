@@ -11,6 +11,9 @@
 		"rsccdrsccdgjacp5rwplhcesrv_bronze_connectionString": {
 			"value": ""
 		},
+		"AzureBlobStorage_connectionString": {
+			"value": ""
+		},
 		"containerUri": {
 			"value": ""
 		},
